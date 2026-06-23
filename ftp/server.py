@@ -13,11 +13,30 @@ FTP_PASV_ADDRESS = os.getenv("FTP_PASV_ADDRESS", "")
 
 
 class AutoMkdirFTPHandler(FTPHandler):
+    def _mkdir_parent_for_ftp_path(self, path):
+        real_path = self.fs.ftp2fs(path)
+        root = os.path.abspath(FTP_ROOT)
+        real_path = os.path.abspath(real_path)
+
+        if not real_path.startswith(root + os.sep) and real_path != root:
+            return
+
+        parent = os.path.dirname(real_path)
+        os.makedirs(parent, exist_ok=True)
+
     def ftp_CWD(self, path):
         real_path = self.fs.ftp2fs(path)
-        if real_path.startswith(os.path.abspath(FTP_ROOT)):
+        root = os.path.abspath(FTP_ROOT)
+        real_path = os.path.abspath(real_path)
+
+        if real_path.startswith(root + os.sep) or real_path == root:
             os.makedirs(real_path, exist_ok=True)
+
         return super().ftp_CWD(path)
+
+    def ftp_STOR(self, file, mode='w'):
+        self._mkdir_parent_for_ftp_path(file)
+        return super().ftp_STOR(file, mode)
 
 
 os.makedirs(FTP_ROOT, exist_ok=True)
