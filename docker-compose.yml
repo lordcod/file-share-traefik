@@ -1,0 +1,61 @@
+name: file-share
+
+services:
+  http:
+    image: nginx:alpine
+    container_name: file-share-http
+    restart: unless-stopped
+    volumes:
+      - ./data:/srv/ftp:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+      # HTTPS router
+      # - "traefik.http.routers.file-share.rule=Host(`${HTTP_HOST}`)"
+      # - "traefik.http.routers.file-share.entrypoints=websecure"
+      # - "traefik.http.routers.file-share.tls=true"
+      # - "traefik.http.routers.file-share.tls.certresolver=letsencrypt"
+      # - "traefik.http.routers.file-share.service=file-share"
+
+      # HTTP -> HTTPS redirect router
+      - "traefik.http.routers.file-share-http.rule=Host(`${HTTP_HOST}`)"
+      - "traefik.http.routers.file-share-http.entrypoints=web"
+      # - "traefik.http.routers.file-share-http.middlewares=file-share-https-redirect"
+      - "traefik.http.routers.file-share-http.service=file-share"
+      # - "traefik.http.middlewares.file-share-https-redirect.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.file-share-https-redirect.redirectscheme.permanent=true"
+
+      # Internal nginx port
+      - "traefik.http.services.file-share.loadbalancer.server.port=80"
+    networks:
+      - proxy
+  ftp:
+    build:
+      context: ./ftp
+    container_name: file-share-ftp
+    restart: unless-stopped
+    environment:
+      FTP_USER: ${FTP_USER}
+      FTP_PASSWORD: ${FTP_PASSWORD}
+      FTP_ROOT: /srv/ftp
+      FTP_UID: ${FTP_UID:-1000}
+      FTP_GID: ${FTP_GID:-1000}
+      FTP_PASSIVE_MIN_PORT: ${FTP_PASSIVE_MIN_PORT:-40000}
+      FTP_PASSIVE_MAX_PORT: ${FTP_PASSIVE_MAX_PORT:-40100}
+      FTP_PASV_ADDRESS: ${FTP_PASV_ADDRESS}
+    volumes:
+      - ./data:/srv/ftp
+    ports:
+      - "${FTP_CONTROL_PORT:-21}:21"
+      - "${FTP_PASSIVE_MIN_PORT:-40000}-${FTP_PASSIVE_MAX_PORT:-40100}:${FTP_PASSIVE_MIN_PORT:-40000}-${FTP_PASSIVE_MAX_PORT:-40100}"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 21"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  proxy:
+    external: true

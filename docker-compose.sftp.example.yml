@@ -1,0 +1,32 @@
+# Optional SFTP variant. SFTP is usually simpler than FTP: one TCP port, no passive port range.
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.sftp.example.yml up -d
+#
+# Direct mode below publishes SFTP as host port 2222 by default.
+# Connect with: sftp -P 2222 sftpdeploy@your-server
+
+services:
+  sftp:
+    image: atmoz/sftp:alpine
+    container_name: file-share-sftp
+    restart: unless-stopped
+    volumes:
+      - ./data:/home/${SFTP_USER:-sftpdeploy}/upload
+    ports:
+      - "${SFTP_HOST_PORT:-2222}:22"
+    command: "${SFTP_USER:-sftpdeploy}:${SFTP_PASSWORD:-change-me-now}:1000:1000:upload"
+
+    # If you want to route SFTP through Traefik TCP instead of direct ports:
+    # 1. Add an entryPoint to Traefik static config, for example: sftp=:2222.
+    # 2. Remove the `ports:` block above.
+    # 3. Uncomment networks + labels below.
+    #    Since SSH has no TLS SNI, HostSNI(`*`) can only catch all traffic on that entryPoint.
+    # networks:
+    #   - traefik
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.docker.network=${TRAEFIK_NETWORK}"
+    #   - "traefik.tcp.routers.file-share-sftp.entrypoints=sftp"
+    #   - "traefik.tcp.routers.file-share-sftp.rule=HostSNI(`*`)"
+    #   - "traefik.tcp.routers.file-share-sftp.service=file-share-sftp"
+    #   - "traefik.tcp.services.file-share-sftp.loadbalancer.server.port=22"

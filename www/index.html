@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>SwimTime — хронометраж соревнований по плаванию</title>
+    <meta
+      name="description"
+      content="SwimTime — хронометраж соревнований, публикация стартовых листов, результатов и итоговых протоколов."
+    />
+
+    <style>
+      :root {
+        --bg: #07131f;
+        --bg-soft: #0d1d2b;
+        --card: rgba(255, 255, 255, 0.06);
+        --line: rgba(255, 255, 255, 0.11);
+        --text: #f4f8fb;
+        --muted: #9db0bf;
+        --accent: #2bb7ff;
+        --accent-2: #5ce1e6;
+        --max-width: 1180px;
+        --radius: 24px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: Inter, Arial, Helvetica, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(43, 183, 255, 0.18),
+            transparent 32%
+          ),
+          linear-gradient(180deg, #07131f 0%, #091725 55%, #07131f 100%);
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .container {
+        width: min(calc(100% - 40px), var(--max-width));
+        margin: 0 auto;
+      }
+
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(14px);
+        background: rgba(7, 19, 31, 0.76);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .header__inner {
+        min-height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+
+      .logo {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+      }
+
+      .logo span {
+        color: var(--accent);
+      }
+
+      .hero {
+        min-height: calc(100vh - 76px);
+        display: flex;
+        align-items: center;
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 540px;
+        height: 540px;
+        right: -180px;
+        top: 40px;
+        border-radius: 50%;
+        border: 1px solid rgba(92, 225, 230, 0.22);
+        box-shadow:
+          0 0 0 80px rgba(43, 183, 255, 0.03),
+          0 0 0 160px rgba(43, 183, 255, 0.02);
+        pointer-events: none;
+      }
+
+      .hero__content {
+        max-width: 860px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 24px;
+        color: var(--accent-2);
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 34px;
+        height: 1px;
+        background: currentColor;
+      }
+
+      h1 {
+        max-width: 900px;
+        font-size: clamp(48px, 8vw, 104px);
+        line-height: 0.94;
+        letter-spacing: -0.065em;
+        text-transform: uppercase;
+      }
+
+      .hero__text {
+        max-width: 720px;
+        margin-top: 28px;
+        color: var(--muted);
+        font-size: clamp(18px, 2.2vw, 23px);
+      }
+
+      .ticker {
+        margin-top: 74px;
+        padding: 18px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        overflow: hidden;
+        white-space: nowrap;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 14px;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+
+      .bottom {
+        padding: 0 0 46px;
+      }
+
+      .bottom__grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .panel {
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background:
+          linear-gradient(135deg, rgba(43, 183, 255, 0.08), transparent 54%),
+          var(--card);
+        backdrop-filter: blur(12px);
+      }
+
+      .panel__title {
+        margin-bottom: 24px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .contacts {
+        display: grid;
+        gap: 12px;
+      }
+
+      .contact {
+        min-height: 68px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 13px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 17px;
+        background: rgba(255, 255, 255, 0.035);
+        transition: 0.2s ease;
+      }
+
+      .contact:hover {
+        transform: translateX(4px);
+        border-color: rgba(43, 183, 255, 0.35);
+        background: rgba(255, 255, 255, 0.065);
+      }
+
+      .contact__icon {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 13px;
+        color: #06131d;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      }
+
+      .contact__icon svg {
+        width: 21px;
+        height: 21px;
+      }
+
+      .contact__caption {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .contact__value {
+        margin-top: 2px;
+        font-size: 16px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+      }
+
+      .partners {
+        display: grid;
+        gap: 12px;
+      }
+
+      .partner {
+        min-height: 104px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 17px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 19px;
+        background: rgba(255, 255, 255, 0.035);
+        transition: 0.2s ease;
+      }
+
+      .partner:hover {
+        transform: translateY(-3px);
+        border-color: rgba(92, 225, 230, 0.35);
+        background: rgba(255, 255, 255, 0.065);
+      }
+
+      .partner__logo {
+        width: 76px;
+        height: 76px;
+        flex: 0 0 76px;
+        display: grid;
+        place-items: center;
+        border-radius: 18px;
+        background: linear-gradient(145deg, #102b3f, #081824);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        box-shadow: inset 0 1px rgba(255, 255, 255, 0.05);
+      }
+
+      .partner__logo svg {
+        width: 52px;
+        height: 52px;
+      }
+
+      .partner__name {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+
+      .partner__description {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .partner__arrow {
+        margin-left: auto;
+        color: var(--accent);
+        font-size: 22px;
+      }
+
+      .footer {
+        margin-top: 18px;
+        padding: 24px 0 0;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @media (max-width: 860px) {
+        .hero {
+          min-height: auto;
+          padding: 84px 0 70px;
+        }
+
+        .bottom__grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .container {
+          width: min(calc(100% - 24px), var(--max-width));
+        }
+
+        h1 {
+          font-size: clamp(42px, 16vw, 68px);
+        }
+
+        .panel {
+          padding: 22px;
+        }
+
+        .partner {
+          align-items: flex-start;
+        }
+
+        .partner__logo {
+          width: 58px;
+          height: 58px;
+          flex-basis: 58px;
+        }
+
+        .footer {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="container header__inner">
+        <a class="logo" href="#top">Swim<span>Time</span></a>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="container">
+          <div class="hero__content">
+            <div class="eyebrow">Сервис для соревнований по плаванию</div>
+
+            <h1>Хронометраж соревнований</h1>
+
+            <p class="hero__text">
+              Публикация стартовых листов, программы соревнований, результатов и
+              итоговых протоколов.
+            </p>
+          </div>
+
+          <div class="ticker" aria-hidden="true">
+            Стартовые листы · Заплывы · Результаты · Протоколы ·
+            Онлайн-обновления · Стартовые листы · Заплывы · Результаты ·
+            Протоколы · Онлайн-обновления
+          </div>
+        </div>
+      </section>
+
+      <section class="bottom">
+        <div class="container">
+          <div class="bottom__grid">
+            <div class="panel">
+              <div class="panel__title">Контакты</div>
+
+              <div class="contacts">
+                <a class="contact" href="mailto:mail@fincubes.ru">
+                  <span class="contact__icon">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M4 6.5h16v11H4v-11Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                      />
+                      <path
+                        d="m5 7.5 7 5 7-5"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </span>
+                  <span>
+                    <div class="contact__caption">FinCubes</div>
+                    <div class="contact__value">mail@fincubes.ru</div>
+                  </span>
+                </a>
+
+                <a class="contact" href="mailto:admin@sportcommission.ru">
+                  <span class="contact__icon">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M4 6.5h16v11H4v-11Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                      />
+                      <path
+                        d="m5 7.5 7 5 7-5"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </span>
+                  <span>
+                    <div class="contact__caption">SportCommission</div>
+                    <div class="contact__value">admin@sportcommission.ru</div>
+                  </span>
+                </a>
+
+                <a class="contact" href="tel:+79999269010">
+                  <span class="contact__icon">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M7.2 3.8 9.5 8l-2 1.6c1.1 2.4 2.8 4.1 5.2 5.2l1.6-2 4.2 2.3-.7 3.2c-.2.8-.9 1.4-1.8 1.4C9.5 19.3 4.7 14.5 4.3 8c0-.9.6-1.6 1.4-1.8l1.5-.4Z"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <span>
+                    <div class="contact__caption">Телефон</div>
+                    <div class="contact__value">+7 (999) 926-90-10</div>
+                  </span>
+                </a>
+
+                <a
+                  class="contact"
+                  href="https://t.me/dybfuo"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <span class="contact__icon">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="m20 4-3 15-5-4-3 2 .6-4.5L17 6.8 8 12 4 10.6 20 4Z"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <span>
+                    <div class="contact__caption">Telegram</div>
+                    <div class="contact__value">@dybfuo</div>
+                  </span>
+                </a>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel__title">Партнёры</div>
+
+              <div class="partners">
+                <a
+                  class="partner"
+                  href="https://fincubes.ru"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <span class="partner__logo">
+                    <svg
+                      viewBox="0 0 675 670"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill="#FFFFFF"
+                        d="M474.132 244.384V438.565L462.508 431.853C427.302 369.698 386.331 320.974 349.444 286.771C334.327 272.754 319.615 260.917 305.967 251.502V147.294L474.132 244.384ZM674.132 341.475L505.967 438.565V244.384L674.132 147.294V341.475ZM657.297 122.384L489.132 219.475L320.967 122.384L489.132 25.294L657.297 122.384Z"
+                      ></path>
+                      <path
+                        fill="#FFFFFF"
+                        d="M55.967 0.794077C106.816 -9.67484 194.941 83.7389 238.081 259.229C247.261 334.564 188.313 372.78 150.967 369.294C114.693 365.908 96.2352 354.129 78.2864 320.753L76.467 316.794C76.3954 317.498 76.328 318.202 76.26 318.906C76.1139 320.155 75.9996 321.416 75.9084 322.729C63.6257 463.513 122.251 612.654 142.467 638.294C106.434 531.612 95.5735 459.485 104.835 379.94C124.263 388.978 145.903 392.089 166.754 389.452C197.316 394.768 221.007 482.285 279.967 588.794C246.012 446.98 198.592 385.954 206.935 376.332C228.886 364.05 246.842 343.778 255.724 315.816C326.683 373.385 354.207 415.78 394.967 498.294C371.177 411.011 333.535 356.892 261.661 280.002C261.802 275.743 261.768 271.365 261.549 266.867C304.778 287.714 387.199 360.164 445.967 477.294C463.967 508.294 464.967 548.294 434.967 564.794C354.467 591.294 356.467 578.294 234.967 648.794C210.467 665.794 149.967 685.294 121.467 647.294C-1.03267 459.294 93.467 362.294 5.46703 126.294C0.467017 92.794 -17.0325 21.7941 55.967 0.794077ZM215.379 297.568C211.388 293.75 205.058 293.891 201.24 297.882C191.964 307.58 170.877 321.415 138.045 322.803C132.528 323.036 128.243 327.698 128.476 333.216C128.709 338.734 133.371 343.018 138.889 342.785C177.057 341.173 202.97 325.009 215.694 311.706C219.511 307.715 219.37 301.385 215.379 297.568ZM204.433 245.708C200.243 241.309 193.28 241.139 188.881 245.328C179.873 253.907 150.852 272.389 117.666 273.298C111.594 273.465 106.805 278.522 106.971 284.595C107.137 290.667 112.195 295.456 118.268 295.29C158.081 294.199 192.06 272.681 204.053 261.26C208.452 257.07 208.622 250.107 204.433 245.708ZM188.209 195.641C183.982 190.537 176.418 189.825 171.314 194.052C161.548 202.139 136.582 219.371 103.94 220.806C97.3191 221.097 92.1878 226.701 92.4787 233.321C92.7701 239.942 98.3737 245.073 104.994 244.782C145.151 243.017 175.052 222.116 186.62 212.536C191.725 208.309 192.436 200.745 188.209 195.641ZM134.967 80.2941C109.967 42.2943 92.4669 23.2941 64.467 28.2941C37.4672 36.2942 17.4673 69.2944 49.467 127.294C69.467 154.794 110.467 188.794 148.967 159.794C167.467 140.794 164.167 132.694 134.967 80.2941Z"
+                      ></path>
+                    </svg>
+                  </span>
+
+                  <span>
+                    <div class="partner__name">FinCubes</div>
+                    <div class="partner__description">
+                      Статистика подводного спорта
+                    </div>
+                  </span>
+
+                  <span class="partner__arrow">↗</span>
+                </a>
+
+                <a
+                  class="partner"
+                  href="https://sportcommission.ru"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <span class="partner__logo">
+                    <svg
+                      viewBox="0 0 198 186"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="84.5"
+                        cy="18.5"
+                        r="18.5"
+                        fill="#FFFFFF"
+                      ></circle>
+                      <path
+                        d="M99.5664 125.188 C109.585 150.843 133.917 171.41 153 179.5 C120.143 178.58 95.4021 172.627 77.9111 163.439 C85.279 149.478 92.5158 136.759 99.5664 125.188 Z M197 12 C174 18 152 29 132 43 C122 50 113 58 104 67 C82 89 64 112 53.8 127.5 C50.7 125.8 47.7 124.2 44.8 122.8 C38.2 77 98 20 197 12 Z"
+                        fill="#FFFFFF"
+                      ></path>
+                      <path
+                        d="M197 12 C176 22 122 63 59.8 186 C51.8 175 32.5 147.5 0 114 C10.5 114.5 30.5 120.5 56.6 135.2 C77.2 102.8 132.8 27.5 197 12 Z"
+                        fill="#FFFFFF"
+                      ></path>
+                    </svg>
+                  </span>
+
+                  <span>
+                    <div class="partner__name">SportCommission</div>
+                    <div class="partner__description">
+                      Онлайн-комиссия участников
+                    </div>
+                  </span>
+
+                  <span class="partner__arrow">↗</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <footer class="footer">
+            <div>© 2026 SwimTime</div>
+            <div>Хронометраж соревнований по плаванию</div>
+          </footer>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
