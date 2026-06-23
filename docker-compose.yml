@@ -13,19 +13,19 @@ services:
       - "traefik.docker.network=proxy"
 
       # HTTPS router
-      # - "traefik.http.routers.file-share.rule=Host(`${HTTP_HOST}`)"
-      # - "traefik.http.routers.file-share.entrypoints=websecure"
-      # - "traefik.http.routers.file-share.tls=true"
-      # - "traefik.http.routers.file-share.tls.certresolver=letsencrypt"
-      # - "traefik.http.routers.file-share.service=file-share"
+      - "traefik.http.routers.file-share.rule=Host(`${HTTP_HOST}`)"
+      - "traefik.http.routers.file-share.entrypoints=websecure"
+      - "traefik.http.routers.file-share.tls=true"
+      - "traefik.http.routers.file-share.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.file-share.service=file-share"
 
       # HTTP -> HTTPS redirect router
       - "traefik.http.routers.file-share-http.rule=Host(`${HTTP_HOST}`)"
       - "traefik.http.routers.file-share-http.entrypoints=web"
-      # - "traefik.http.routers.file-share-http.middlewares=file-share-https-redirect"
+      - "traefik.http.routers.file-share-http.middlewares=file-share-https-redirect"
       - "traefik.http.routers.file-share-http.service=file-share"
-      # - "traefik.http.middlewares.file-share-https-redirect.redirectscheme.scheme=https"
-      # - "traefik.http.middlewares.file-share-https-redirect.redirectscheme.permanent=true"
+      - "traefik.http.middlewares.file-share-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.file-share-https-redirect.redirectscheme.permanent=true"
 
       # Internal nginx port
       - "traefik.http.services.file-share.loadbalancer.server.port=80"
