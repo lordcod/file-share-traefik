@@ -1,11 +1,9 @@
-FROM alpine:3.22
+FROM python:3.12-alpine
 
-RUN apk add --no-cache bash shadow vsftpd
+RUN pip install --no-cache-dir pyftpdlib
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY server.py /server.py
 
 EXPOSE 21 40000-40100
 
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["vsftpd", "/etc/vsftpd/vsftpd.conf"]
+CMD ["python", "/server.py"]
