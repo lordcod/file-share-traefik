@@ -47,7 +47,7 @@ file_open_mode=0664
 idle_session_timeout=3600
 data_connection_timeout=600
 ssl_enable=NO
-pam_service_name=vsftpd
+seccomp_sandbox=NO
 EOF_CONF
 
 if [[ -n "${FTP_PASV_ADDRESS}" ]]; then
