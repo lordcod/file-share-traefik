@@ -30,7 +30,6 @@ find "${FTP_ROOT}" -type f -exec chmod 0664 {} +
 cat > /etc/vsftpd/vsftpd.conf <<EOF_CONF
 listen=YES
 listen_ipv6=NO
-background=NO
 anonymous_enable=NO
 local_enable=YES
 write_enable=YES
@@ -49,7 +48,6 @@ idle_session_timeout=3600
 data_connection_timeout=600
 ssl_enable=NO
 pam_service_name=vsftpd
-seccomp_sandbox=NO
 EOF_CONF
 
 if [[ -n "${FTP_PASV_ADDRESS}" ]]; then

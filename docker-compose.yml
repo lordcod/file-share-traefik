@@ -10,7 +10,7 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+      - "traefik.docker.network=proxy"
 
       # HTTPS router
       # - "traefik.http.routers.file-share.rule=Host(`${HTTP_HOST}`)"
