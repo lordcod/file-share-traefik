@@ -17,27 +17,17 @@ FTP_PASV_ADDRESS = os.getenv("FTP_PASV_ADDRESS", "")
 
 
 class AutoMkdirFTPHandler(FTPHandler):
-    def _safe_mkdir_for_file(self, ftp_path):
-        real_file = os.path.abspath(self.fs.ftp2fs(ftp_path))
+    def _to_real_path(self, path):
         root = os.path.abspath(FTP_ROOT)
+        path = os.path.abspath(path)
 
-        logging.info("STOR requested ftp_path=%s real_file=%s",
-                     ftp_path, real_file)
+        if path.startswith(root + os.sep) or path == root:
+            return path
 
-        if not real_file.startswith(root + os.sep):
-            logging.warning("Blocked path outside FTP root: %s", real_file)
-            return
-
-        parent = os.path.dirname(real_file)
-        os.makedirs(parent, exist_ok=True)
-        logging.info("Created parent dir: %s", parent)
-
-    def ftp_STOR(self, file, mode="w"):
-        self._safe_mkdir_for_file(file)
-        return super().ftp_STOR(file, mode)
+        return os.path.abspath(self.fs.ftp2fs(path))
 
     def ftp_CWD(self, path):
-        real_dir = os.path.abspath(self.fs.ftp2fs(path))
+        real_dir = self._to_real_path(path)
         root = os.path.abspath(FTP_ROOT)
 
         logging.info("CWD requested path=%s real_dir=%s", path, real_dir)
@@ -46,7 +36,20 @@ class AutoMkdirFTPHandler(FTPHandler):
             os.makedirs(real_dir, exist_ok=True)
             logging.info("Created dir: %s", real_dir)
 
-        return super().ftp_CWD(path)
+        return super().ftp_CWD(real_dir)
+
+    def ftp_STOR(self, file, mode="w"):
+        real_file = self._to_real_path(file)
+        root = os.path.abspath(FTP_ROOT)
+
+        logging.info("STOR requested file=%s real_file=%s", file, real_file)
+
+        if real_file.startswith(root + os.sep):
+            parent = os.path.dirname(real_file)
+            os.makedirs(parent, exist_ok=True)
+            logging.info("Created parent dir: %s", parent)
+
+        return super().ftp_STOR(real_file, mode)
 
 
 os.makedirs(FTP_ROOT, exist_ok=True)
