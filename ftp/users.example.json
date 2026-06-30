@@ -1,0 +1,15 @@
+{
+  "users": [
+    {
+      "username": "client1",
+      "password": "change-me-now",
+      "folder": "files.client1.ru"
+    },
+    {
+      "username": "client2",
+      "password": "change-me-now",
+      "folder": "files.client2.ru",
+      "permissions": "elr"
+    }
+  ]
+}

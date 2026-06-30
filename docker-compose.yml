@@ -19,11 +19,27 @@ services:
       - "traefik.http.routers.file-share.tls.certresolver=letsencrypt"
       - "traefik.http.routers.file-share.service=file-share"
 
+      # Add another HTTPS router for every additional domain.
+      # All routers use the same nginx service; nginx selects ./data/<domain>.
+      # - "traefik.http.routers.client2.rule=Host(`files.client2.ru`)"
+      # - "traefik.http.routers.client2.entrypoints=websecure"
+      # - "traefik.http.routers.client2.tls=true"
+      # - "traefik.http.routers.client2.tls.certresolver=letsencrypt"
+      # - "traefik.http.routers.client2.service=file-share"
+
       # HTTP -> HTTPS redirect router
       - "traefik.http.routers.file-share-http.rule=Host(`${HTTP_HOST}`)"
       - "traefik.http.routers.file-share-http.entrypoints=web"
       - "traefik.http.routers.file-share-http.middlewares=file-share-https-redirect"
       - "traefik.http.routers.file-share-http.service=file-share"
+
+      # Add the additional domain to the HTTP redirect router as well:
+      # - "traefik.http.routers.client2-http.rule=Host(`files.client2.ru`)"
+      # - "traefik.http.routers.client2-http.entrypoints=web"
+      # - "traefik.http.routers.client2-http.middlewares=file-share-https-redirect"
+      # - "traefik.http.routers.client2-http.service=file-share"
+      
+      
       - "traefik.http.middlewares.file-share-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.file-share-https-redirect.redirectscheme.permanent=true"
 
@@ -37,9 +53,8 @@ services:
     container_name: file-share-ftp
     restart: unless-stopped
     environment:
-      FTP_USER: ${FTP_USER}
-      FTP_PASSWORD: ${FTP_PASSWORD}
       FTP_ROOT: /srv/ftp
+      FTP_USERS_FILE: /config/users.json
       FTP_UID: ${FTP_UID:-1000}
       FTP_GID: ${FTP_GID:-1000}
       FTP_PASSIVE_MIN_PORT: ${FTP_PASSIVE_MIN_PORT:-40000}
@@ -47,6 +62,7 @@ services:
       FTP_PASV_ADDRESS: ${FTP_PASV_ADDRESS}
     volumes:
       - ./data:/srv/ftp
+      - ./ftp/users.json:/config/users.json:ro
     ports:
       - "${FTP_CONTROL_PORT:-21}:21"
       - "${FTP_PASSIVE_MIN_PORT:-40000}-${FTP_PASSIVE_MAX_PORT:-40100}:${FTP_PASSIVE_MIN_PORT:-40000}-${FTP_PASSIVE_MAX_PORT:-40100}"
