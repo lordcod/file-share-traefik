@@ -34,28 +34,29 @@ services:
   ftp:
     build:
       context: ./ftp
+
     container_name: file-share-ftp
     restart: unless-stopped
+
+    network_mode: host
+
     environment:
       FTP_USER: ${FTP_USER}
       FTP_PASSWORD: ${FTP_PASSWORD}
       FTP_ROOT: /srv/ftp
-      FTP_UID: ${FTP_UID:-1000}
-      FTP_GID: ${FTP_GID:-1000}
+
       FTP_PASSIVE_MIN_PORT: ${FTP_PASSIVE_MIN_PORT:-40000}
-      FTP_PASSIVE_MAX_PORT: ${FTP_PASSIVE_MAX_PORT:-40100}
+      FTP_PASSIVE_MAX_PORT: ${FTP_PASSIVE_MAX_PORT:-40019}
       FTP_PASV_ADDRESS: ${FTP_PASV_ADDRESS}
+
     volumes:
       - ./data:/srv/ftp
-    ports:
-      - "${FTP_CONTROL_PORT:-21}:21"
-      - "${FTP_PASSIVE_MIN_PORT:-40000}-${FTP_PASSIVE_MAX_PORT:-40100}:${FTP_PASSIVE_MIN_PORT:-40000}-${FTP_PASSIVE_MAX_PORT:-40100}"
+
     healthcheck:
       test: ["CMD-SHELL", "nc -z 127.0.0.1 21"]
       interval: 30s
       timeout: 5s
       retries: 3
-
 networks:
   proxy:
     external: true

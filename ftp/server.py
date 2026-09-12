@@ -12,7 +12,9 @@ FTP_USER = os.getenv("FTP_USER", "ftpdeploy")
 FTP_PASSWORD = os.environ["FTP_PASSWORD"]
 FTP_ROOT = os.getenv("FTP_ROOT", "/srv/ftp")
 FTP_PASSIVE_MIN_PORT = int(os.getenv("FTP_PASSIVE_MIN_PORT", "40000"))
-FTP_PASSIVE_MAX_PORT = int(os.getenv("FTP_PASSIVE_MAX_PORT", "40100"))
+FTP_PASSIVE_MAX_PORT = int(
+    os.getenv("FTP_PASSIVE_MAX_PORT", "40019")
+)
 FTP_PASV_ADDRESS = os.getenv("FTP_PASV_ADDRESS", "")
 
 
