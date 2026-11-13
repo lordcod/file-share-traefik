@@ -1,5 +1,13 @@
 # FTP + HTTPS file share behind existing Traefik
 
+## Live redirect and administration
+
+`/live` redirects to the competition with the most active FTP upload minutes
+over the last 24 hours. `/admin/live` allows manual pinning or returning to
+automatic selection. Configure separate `LIVE_ADMIN_USER` and
+`LIVE_ADMIN_PASSWORD` environment values to enable the protected admin page.
+See [live operation and deployment](docs/live.md).
+
 ## SwimTab competition catalog
 
 The `catalog` service scans `data/<year>/<series>/<code>/index.html` every

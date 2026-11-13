@@ -3,6 +3,7 @@ FROM python:3.12-alpine
 RUN pip install --no-cache-dir pyftpdlib
 
 COPY server.py /server.py
+RUN python -m py_compile /server.py
 
 EXPOSE 21 40000-40100
 

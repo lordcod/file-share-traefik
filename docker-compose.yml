@@ -32,6 +32,7 @@ services:
       - "traefik.http.services.file-share.loadbalancer.server.port=80"
     networks:
       - proxy
+      - live-internal
   ftp:
     build:
       context: ./ftp
@@ -45,6 +46,7 @@ services:
       FTP_USER: ${FTP_USER}
       FTP_PASSWORD: ${FTP_PASSWORD}
       FTP_ROOT: /srv/ftp
+      LIVE_DB: /srv/live/live.sqlite3
 
       FTP_PASSIVE_MIN_PORT: ${FTP_PASSIVE_MIN_PORT:-40000}
       FTP_PASSIVE_MAX_PORT: ${FTP_PASSIVE_MAX_PORT:-40019}
@@ -52,6 +54,7 @@ services:
 
     volumes:
       - ./data:/srv/ftp
+      - live-data:/srv/live
 
     healthcheck:
       test: ["CMD-SHELL", "nc -z 127.0.0.1 21"]
@@ -69,9 +72,27 @@ services:
       - ./data:/srv/ftp:ro
       - catalog-data:/srv/catalog
 
+  live:
+    build:
+      context: ./live
+    restart: unless-stopped
+    environment:
+      LIVE_ADMIN_USER: ${LIVE_ADMIN_USER:-admin}
+      LIVE_ADMIN_PASSWORD: ${LIVE_ADMIN_PASSWORD:-}
+      LIVE_DB: /srv/live/live.sqlite3
+    volumes:
+      - ./data:/srv/ftp:ro
+      - catalog-data:/srv/catalog:ro
+      - live-data:/srv/live
+    networks:
+      - live-internal
+
 volumes:
   catalog-data:
+  live-data:
 
 networks:
+  live-internal:
+    internal: true
   proxy:
     external: true

@@ -1,5 +1,8 @@
 import os
 import logging
+import sqlite3
+import time
+from pathlib import Path
 
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
@@ -19,6 +22,24 @@ FTP_PASV_ADDRESS = os.getenv("FTP_PASV_ADDRESS", "")
 
 
 class AutoMkdirFTPHandler(FTPHandler):
+    def on_file_received(self, file):
+        """Count successful transfers once per competition per UTC minute."""
+        database = os.getenv("LIVE_DB")
+        if not database:
+            return
+        try:
+            parts = Path(file).resolve().relative_to(Path(FTP_ROOT).resolve()).parts
+            if (len(parts) < 4 or len(parts[0]) != 4 or not parts[0].isascii()
+                    or not parts[0].isdigit() or any(p.startswith((".", "_")) for p in parts[1:3])):
+                return
+            with sqlite3.connect(database, timeout=2) as db:
+                db.execute("CREATE TABLE IF NOT EXISTS activity (competition TEXT, minute INTEGER, PRIMARY KEY (competition, minute))")
+                minute = int(time.time() // 60)
+                db.execute("INSERT OR IGNORE INTO activity VALUES (?, ?)", ("/".join(parts[:3]), minute))
+                db.execute("DELETE FROM activity WHERE minute < ?", (minute - 1440,))
+        except (OSError, ValueError, sqlite3.Error):
+            logging.exception("Could not record live activity; FTP upload remains successful")
+
     def _to_real_path(self, path):
         root = os.path.abspath(FTP_ROOT)
         path = os.path.abspath(path)
