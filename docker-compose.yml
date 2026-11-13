@@ -8,6 +8,7 @@ services:
     volumes:
       - ./data:/srv/ftp:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - catalog-data:/srv/catalog:ro
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
@@ -57,6 +58,20 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+  catalog:
+    build:
+      context: ./catalog
+    restart: unless-stopped
+    network_mode: none
+    environment:
+      CATALOG_INTERVAL_SECONDS: "60"
+    volumes:
+      - ./data:/srv/ftp:ro
+      - catalog-data:/srv/catalog
+
+volumes:
+  catalog-data:
+
 networks:
   proxy:
     external: true

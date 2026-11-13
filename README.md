@@ -1,5 +1,16 @@
 # FTP + HTTPS file share behind existing Traefik
 
+## SwimTab competition catalog
+
+The `catalog` service scans `data/<year>/<series>/<code>/index.html` every
+60 seconds and publishes `/catalog.json` through nginx. It extracts the title,
+session dates and source update time from SPLASH HTML without changing uploads.
+The static SwimTab homepage can fetch this JSON at runtime, including from a
+different origin. Catalog state persists in the `catalog-data` Docker volume.
+
+See [the version 1 integration contract](docs/catalog-contract.md) for the exact
+schema, missing-field handling, deployment commands and deletion semantics.
+
 This repository is a Docker Compose version of the Ansible playbook:
 
 - FTP upload into `./data`
