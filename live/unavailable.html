@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Ничего не найдено · SwimTab</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f9;
+      --surface: #fff;
+      --text: #1a2233;
+      --muted: #6b7587;
+      --border: #e3e7ee;
+      --accent: #1e84ee;
+      --accent-dark: #1468c4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 280px;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    header {
+      padding: 36px 24px 88px;
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      color: #fff;
+    }
+    .header-inner { max-width: 952px; margin: 0 auto; }
+    .brand { color: inherit; font-size: 28px; font-weight: 700; letter-spacing: -.02em; text-decoration: none; }
+    .tagline { margin: 6px 0 0; color: #e5f1ff; }
+    main { max-width: 1000px; margin: -48px auto 0; padding: 0 24px 48px; }
+    .card {
+      overflow: hidden;
+      border-radius: 12px;
+      background: var(--surface);
+      box-shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 8px 24px rgb(16 24 40 / 8%);
+    }
+    .content {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      align-items: center;
+      gap: 40px;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 72px 40px;
+    }
+    .symbol {
+      display: grid;
+      place-items: center;
+      color: #82b6ed;
+    }
+    .symbol svg { width: 96px; height: 96px; }
+    h1 { margin: 0; font-size: clamp(26px, 4vw, 34px); line-height: 1.2; letter-spacing: -.02em; text-wrap: balance; }
+    .description { max-width: 410px; margin: 14px 0 0; color: var(--muted); font-size: 16px; line-height: 1.65; }
+    .home {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 46px;
+      margin-top: 28px;
+      padding: 12px 20px;
+      border-radius: 6px;
+      background: var(--accent-dark);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background-color .15s;
+    }
+    .home svg { width: 18px; height: 18px; }
+    .home:hover { background: #1057a6; }
+    a:focus-visible { outline: 3px solid var(--accent-dark); outline-offset: 5px; }
+    .brand:focus-visible { outline-color: #fff; }
+    ::selection { background: #d5e9ff; color: var(--text); }
+    @media (max-width: 540px) {
+      header { padding: 28px 20px 72px; }
+      main { margin-top: -40px; padding: 0 16px 32px; }
+      .content { grid-template-columns: 1fr; gap: 24px; padding: 40px 24px; text-align: center; }
+      .symbol svg { width: 72px; height: 72px; }
+      .description { margin-inline: auto; }
+      .home { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) { .home { transition: none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="SwimTab — главная">SwimTab</a>
+      <p class="tagline">Результаты соревнований по плаванию</p>
+    </div>
+  </header>
+  <main>
+    <section class="card" aria-labelledby="page-title">
+      <div class="content">
+        <div class="symbol" aria-hidden="true">
+          <!-- Lucide file-question-mark — https://lucide.dev/icons/file-question-mark
+            ISC License. Copyright (c) 2026 Lucide Icons and Contributors
+            Permission to use, copy, modify, and/or distribute this software for any
+            purpose with or without fee is hereby granted, provided that the above
+            copyright notice and this permission notice appear in all copies.
+            THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+            WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+            MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+            ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+            WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+            ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+            OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+          -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/>
+            <path d="M9 9.5a3 2.5 0 016 0c0 2-2 2-3 3.5M12 17h.01"/>
+          </svg>
+        </div>
+        <div class="message">
+        <h1 id="page-title">Ничего не найдено</h1>
+        <p class="description">По этой ссылке пока нет результатов. Попробуйте зайти позже или выберите соревнование на главной.</p>
+        <a class="home" href="/">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 5-7 7 7 7M5 12h14"/></svg>
+          К соревнованиям
+        </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

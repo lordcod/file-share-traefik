@@ -8,6 +8,7 @@ services:
     volumes:
       - ./data:/srv/ftp:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./live/unavailable.html:/srv/errors/unavailable.html:ro
       - catalog-data:/srv/catalog:ro
     labels:
       - "traefik.enable=true"

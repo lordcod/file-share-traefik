@@ -18,6 +18,7 @@ USER = os.getenv("LIVE_ADMIN_USER", "admin")
 PASSWORD = os.getenv("LIVE_ADMIN_PASSWORD", "")
 CSRF = secrets.token_urlsafe(32)
 ESC = html.escape
+UNAVAILABLE_PAGE = Path(__file__).with_name("unavailable.html").read_text(encoding="utf-8")
 
 
 def target(value):
@@ -158,7 +159,7 @@ class Handler(BaseHTTPRequestHandler):
                 if url:
                     self.send(302, headers={"Location": url})
                 else:
-                    self.send(503, page('<h1>Эфир пока не выбран</h1><p>Попробуйте позже или перейдите <a href="/">на главную</a>.</p>'))
+                    self.send(503, UNAVAILABLE_PAGE)
             elif path in {"/admin/live", "/admin/live/"}:
                 if self.authorized():
                     self.admin("Настройки сохранены." if urlsplit(self.path).query == "saved=1" else "")
